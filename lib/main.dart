@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import '/constants/theme.dart';
-import '/design/screens/home.dart';
-import '/logic/services/theme_services.dart';
+import 'constants/theme.dart';
+import 'design/screens/home.dart';
+import 'logic/services/theme_services.dart';
 
 void main() async {
   await GetStorage.init();

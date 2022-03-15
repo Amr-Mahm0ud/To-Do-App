@@ -7,16 +7,18 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Container(
-        width: 150,
-        padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.all(25),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          borderRadius: BorderRadius.circular(30),
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: ElevatedButton(
+        style: ButtonStyle(
+          elevation: MaterialStateProperty.all(0),
+          padding: MaterialStateProperty.all(
+              const EdgeInsets.symmetric(vertical: 12, horizontal: 40)),
+          shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
+          overlayColor: MaterialStateProperty.all(Colors.white10),
         ),
+        onPressed: onTab,
         child: Text(
           label,
           style: Theme.of(context)
@@ -25,7 +27,6 @@ class CustomButton extends StatelessWidget {
               .copyWith(fontSize: 18, color: Colors.white),
         ),
       ),
-      onTap: onTab,
     );
   }
 }

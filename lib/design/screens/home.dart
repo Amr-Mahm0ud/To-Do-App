@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:todo_app/logic/services/theme_services.dart';
+import 'package:get/get.dart';
+import 'add_task.dart';
+import '../widgets/button.dart';
+import '/logic/services/theme_services.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -22,7 +25,11 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SafeArea(
           child: Column(
-        children: const [],
+        children: [
+          CustomButton('Add Task', () {
+            Get.to(() => const AddTask());
+          })
+        ],
       )),
     );
   }
