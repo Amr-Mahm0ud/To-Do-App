@@ -1,7 +1,10 @@
 import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '/constants/size_config.dart';
+import '/logic/controllers/task_controller.dart';
 import 'add_task.dart';
 import '../widgets/button.dart';
 import '/logic/services/theme_services.dart';
@@ -15,9 +18,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   DateTime selectedDate = DateTime.now();
+  final TaskController _taskController = Get.put(TaskController());
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
     return Scaffold(
       appBar: customAppBar(title: 'ToDo App', centerTitle: false),
       body: SafeArea(
@@ -25,14 +30,53 @@ class _HomePageState extends State<HomePage> {
         children: [
           buildTaskBar(context),
           buildDateTimeLine(context),
+          showTasks(context),
         ],
       )),
     );
   }
 
+  showTasks(BuildContext context) {
+    return Stack(
+      children: [
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 1500),
+          child: SingleChildScrollView(
+            child: Wrap(
+              direction: SizeConfig.orientation == Orientation.landscape
+                  ? Axis.horizontal
+                  : Axis.vertical,
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                SizeConfig.orientation == Orientation.landscape
+                    ? const SizedBox(height: 0)
+                    : const SizedBox(height: 140),
+                SvgPicture.asset(
+                  'assets/images/task.svg',
+                  height: 90,
+                  color: context.theme.primaryColor.withOpacity(0.7),
+                  semanticsLabel: 'Task',
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: Text(
+                    'You do not have any tasks yet! \n Add new tasks to make your days productive.',
+                    textAlign: TextAlign.center,
+                    style: context.textTheme.bodyText1!.copyWith(fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Container buildTaskBar(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(top: 15, left: 20),
+      margin: const EdgeInsets.only(top: 10, left: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -44,14 +88,18 @@ class _HomePageState extends State<HomePage> {
                 style: context.textTheme.headline6,
               ),
               Text(
-                'Today',
+                DateFormat.yMMMMd().format(selectedDate) ==
+                        DateFormat.yMMMMd().format(DateTime.now())
+                    ? 'Today'
+                    : DateFormat.EEEE().format(selectedDate),
                 style: context.textTheme.headline5!
                     .copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
-          CustomButton('Add Task  +', () {
-            Get.to(() => const AddTask());
+          CustomButton('Add Task  +', () async {
+            await Get.to(() => const AddTask());
+            _taskController.getTasks();
           })
         ],
       ),
@@ -86,7 +134,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  buildDateTimeLine(BuildContext context) {
+  Container buildDateTimeLine(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       child: DatePicker(
