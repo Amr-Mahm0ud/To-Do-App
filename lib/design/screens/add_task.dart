@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/design/widgets/button.dart';
 import 'package:todo_app/logic/controllers/task_controller.dart';
+import '../../logic/services/theme_services.dart';
 import '../widgets/input_field.dart';
 
 class AddTask extends StatefulWidget {
@@ -30,8 +31,10 @@ class _AddTaskState extends State<AddTask> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          title: const Text('Add Task'), centerTitle: true, elevation: 0),
+      appBar: customAppBar(
+        title: 'Add Task',
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(15.0),
@@ -195,6 +198,40 @@ class _AddTaskState extends State<AddTask> {
         backgroundColor: color,
         child: isSelected ? const Icon(Icons.done, color: Colors.white) : null,
       ),
+    );
+  }
+
+  AppBar customAppBar({required String title, required bool centerTitle}) {
+    return AppBar(
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back_rounded,
+            color: context.theme.iconTheme.color),
+        onPressed: () {
+          Get.back();
+        },
+      ),
+      actions: [
+        IconButton(
+          onPressed: () => ThemeServices().switchTheme(),
+          icon: Icon(
+              Get.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round,
+              color: context.theme.iconTheme.color),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 10),
+          child: GestureDetector(
+            onTap: () {},
+            child: const CircleAvatar(
+              backgroundImage: AssetImage('assets/images/person.jpeg'),
+            ),
+          ),
+        ),
+      ],
+      title: Text(
+        title,
+        style: TextStyle(color: context.theme.textTheme.headline6!.color),
+      ),
+      centerTitle: centerTitle,
     );
   }
 }

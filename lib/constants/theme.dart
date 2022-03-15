@@ -12,7 +12,7 @@ class Themes {
     primaryColor: prLightClr,
     scaffoldBackgroundColor: Colors.white,
     brightness: Brightness.light,
-    appBarTheme: const AppBarTheme(elevation: 0, backgroundColor: prLightClr),
+    appBarTheme: const AppBarTheme(elevation: 0, backgroundColor: white),
     iconTheme: const IconThemeData(color: darkGreyClr),
     colorScheme: const ColorScheme.light().copyWith(
         primary: prLightClr, secondary: secLClr, error: Colors.redAccent),

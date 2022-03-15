@@ -15,14 +15,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.dark_mode),
-            onPressed: () => ThemeServices().switchTheme(),
-          )
-        ],
-      ),
+      appBar: customAppBar(title: 'ToDo App', centerTitle: false),
       body: SafeArea(
           child: Column(
         children: [
@@ -31,6 +24,34 @@ class _HomePageState extends State<HomePage> {
           })
         ],
       )),
+    );
+  }
+
+  AppBar customAppBar({required String title, required bool centerTitle}) {
+    return AppBar(
+      actions: [
+        IconButton(
+          onPressed: () => ThemeServices().switchTheme(),
+          icon: Icon(
+            Get.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round,
+            color: context.theme.iconTheme.color,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 10),
+          child: GestureDetector(
+            onTap: () {},
+            child: const CircleAvatar(
+              backgroundImage: AssetImage('assets/images/person.jpeg'),
+            ),
+          ),
+        ),
+      ],
+      title: Text(
+        title,
+        style: TextStyle(color: context.theme.textTheme.headline6!.color),
+      ),
+      centerTitle: centerTitle,
     );
   }
 }
