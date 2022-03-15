@@ -13,9 +13,9 @@ class CustomButton extends StatelessWidget {
         style: ButtonStyle(
           elevation: MaterialStateProperty.all(0),
           padding: MaterialStateProperty.all(
-              const EdgeInsets.symmetric(vertical: 12, horizontal: 40)),
+              const EdgeInsets.symmetric(vertical: 12, horizontal: 20)),
           shape: MaterialStateProperty.all(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
           overlayColor: MaterialStateProperty.all(Colors.white10),
         ),
         onPressed: onTab,

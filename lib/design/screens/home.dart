@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'add_task.dart';
 import '../widgets/button.dart';
 import '/logic/services/theme_services.dart';
@@ -19,9 +20,31 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
           child: Column(
         children: [
-          CustomButton('Add Task', () {
-            Get.to(() => const AddTask());
-          })
+          Container(
+            margin: const EdgeInsets.only(top: 15, left: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      DateFormat.yMMMMd().format(DateTime.now()),
+                      style: context.textTheme.headline6,
+                    ),
+                    Text(
+                      'Today',
+                      style: context.textTheme.headline5!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                CustomButton('Add Task  +', () {
+                  Get.to(() => const AddTask());
+                })
+              ],
+            ),
+          ),
         ],
       )),
     );

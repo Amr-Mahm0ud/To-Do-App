@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/design/widgets/button.dart';
 import 'package:todo_app/logic/controllers/task_controller.dart';
-import '../../logic/services/theme_services.dart';
 import '../widgets/input_field.dart';
 
 class AddTask extends StatefulWidget {
@@ -40,18 +39,21 @@ class _AddTaskState extends State<AddTask> {
           padding: const EdgeInsets.all(15.0),
           child: Column(
             children: [
+              // title
               InputField(
                 title: 'Title',
                 hint: 'Enter title here',
                 controller: titleController,
               ),
               const SizedBox(height: 10),
+              // note
               InputField(
                 title: 'Note',
                 hint: 'Enter note here',
                 controller: hintController,
               ),
               const SizedBox(height: 10),
+              // date
               InputField(
                 title: 'Date',
                 hint: DateFormat.yMd().format(currentDate),
@@ -61,6 +63,7 @@ class _AddTaskState extends State<AddTask> {
                 ),
               ),
               const SizedBox(height: 10),
+              // time
               Row(
                 children: [
                   Expanded(
@@ -85,6 +88,7 @@ class _AddTaskState extends State<AddTask> {
                 ],
               ),
               const SizedBox(height: 10),
+              // remind & repeat
               Row(
                 children: [
                   Expanded(
@@ -153,6 +157,7 @@ class _AddTaskState extends State<AddTask> {
                 ],
               ),
               const SizedBox(height: 10),
+              // color
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -211,12 +216,6 @@ class _AddTaskState extends State<AddTask> {
         },
       ),
       actions: [
-        IconButton(
-          onPressed: () => ThemeServices().switchTheme(),
-          icon: Icon(
-              Get.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round,
-              color: context.theme.iconTheme.color),
-        ),
         Padding(
           padding: const EdgeInsets.only(right: 10),
           child: GestureDetector(
