@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_app/logic/models/task.dart';
+import 'package:todo_app/logic/services/notification_services.dart';
 import '/constants/size_config.dart';
 import '/logic/controllers/task_controller.dart';
 import 'add_task.dart';
@@ -19,6 +21,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   DateTime selectedDate = DateTime.now();
   final TaskController _taskController = Get.put(TaskController());
+  late NotifyHelper notifyHelper;
+
+  @override
+  void initState() {
+    super.initState();
+    notifyHelper = NotifyHelper();
+    // notifyHelper.scheduleNotification(hours: 0, minutes: 0, seconds: 3);
+    notifyHelper.iosRequestPermission();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +121,11 @@ class _HomePageState extends State<HomePage> {
     return AppBar(
       actions: [
         IconButton(
-          onPressed: () => ThemeServices().switchTheme(),
+          onPressed: () {
+            ThemeServices().switchTheme();
+            NotifyHelper()
+                .displayNotification(title: 'ToDo App', body: 'theme switched');
+          },
           icon: Icon(
             Get.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round,
             color: context.theme.iconTheme.color,
