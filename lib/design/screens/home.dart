@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:todo_app/logic/models/task.dart';
-import 'package:todo_app/logic/services/notification_services.dart';
+
+import '../widgets/button.dart';
 import '/constants/size_config.dart';
 import '/logic/controllers/task_controller.dart';
-import 'add_task.dart';
-import '../widgets/button.dart';
+import '/logic/services/notification_services.dart';
 import '/logic/services/theme_services.dart';
+import 'add_task.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -42,6 +42,17 @@ class _HomePageState extends State<HomePage> {
           buildTaskBar(context),
           buildDateTimeLine(context),
           showTasks(context),
+          // TaskTile(
+          //   Task(
+          //     title: 'Title',
+          //     note:
+          //         'note note note note note note note note note note note note note note note note note note note note note note note note note',
+          //     isCompleted: 0,
+          //     startTime: '10:30',
+          //     endTime: '11:00',
+          //     color: 1
+          //   ),
+          // ),
         ],
       )),
     );

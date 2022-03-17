@@ -75,7 +75,7 @@ class _AddTaskState extends State<AddTask> {
                           onPressed: () {}),
                     ),
                   ),
-                  const SizedBox(width: 15),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: InputField(
                       title: 'End Time',
@@ -94,7 +94,7 @@ class _AddTaskState extends State<AddTask> {
                   Expanded(
                     child: InputField(
                       title: 'Remind',
-                      hint: '$selectedRemind min early',
+                      hint: '$selectedRemind min',
                       widget: Padding(
                         padding: const EdgeInsets.only(right: 8.0),
                         child: DropdownButton<int>(
@@ -122,7 +122,7 @@ class _AddTaskState extends State<AddTask> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 15),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: InputField(
                       title: 'Repeat',
