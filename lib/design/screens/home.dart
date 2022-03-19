@@ -1,12 +1,14 @@
+import 'package:animations/animations.dart';
 import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animated_button/flutter_animated_button.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_app/design/widgets/task_tile.dart';
 
 import '../../logic/models/task.dart';
-import '../widgets/button.dart';
-import '../widgets/task_tile.dart';
 import '/constants/size_config.dart';
 import '/logic/controllers/task_controller.dart';
 import '/logic/services/notification_services.dart';
@@ -37,39 +39,14 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Scaffold(
-      appBar: customAppBar(title: 'ToDo App', centerTitle: false),
+      appBar: customAppBar(title: 'Hey, Amr Mahmoud'),
       body: SafeArea(
           child: SingleChildScrollView(
         child: Column(
           children: [
             buildTaskBar(context),
             buildDateTimeLine(context),
-            // showTasks(context),
-            GestureDetector(
-              onTap: () {
-                showBottomSheet(
-                  context,
-                  Task(
-                      title: 'Title',
-                      note:
-                          'note note note note note note note note note note note note note note note note note note note note note note note note note',
-                      isCompleted: 0,
-                      startTime: '10:30',
-                      endTime: '11:00',
-                      color: 2),
-                );
-              },
-              child: TaskTile(
-                Task(
-                    title: 'Title',
-                    note:
-                        'note note note note note note note note note note note note note note note note note note note note note note note note note',
-                    isCompleted: 0,
-                    startTime: '10:30',
-                    endTime: '11:00',
-                    color: 2),
-              ),
-            ),
+            showTasks(context),
           ],
         ),
       )),
@@ -77,61 +54,73 @@ class _HomePageState extends State<HomePage> {
   }
 
   showBottomSheet(context, Task task) {
-    Get.bottomSheet(SingleChildScrollView(
-      child: Container(
-        width: SizeConfig.screenWidth * 0.9,
-        height: task.isCompleted == 0
-            ? SizeConfig.screenHeight * 0.35
-            : SizeConfig.screenHeight * 0.25,
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(30),
-            topLeft: Radius.circular(30),
+    final Color color = task.color == 0
+        ? Theme.of(context).colorScheme.primary
+        : task.color == 1
+            ? Theme.of(context).colorScheme.secondary
+            : Colors.teal;
+    Get.bottomSheet(
+      SingleChildScrollView(
+        child: Container(
+          width: SizeConfig.screenWidth * 0.9,
+          height: task.isCompleted == 0
+              ? SizeConfig.screenHeight * 0.4
+              : SizeConfig.screenHeight * 0.3,
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(30),
+              topLeft: Radius.circular(30),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            if (task.isCompleted == 0)
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(task.title!, style: Theme.of(context).textTheme.titleLarge),
+              Divider(color: color, height: 3),
+              if (task.isCompleted == 0)
+                Container(
+                  width: SizeConfig.screenWidth * 0.7,
+                  height: SizeConfig.screenHeight * 0.065,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(color: color, width: 2),
+                      color:
+                          task.isCompleted == 0 ? Colors.transparent : color),
+                  child: AnimatedButton(
+                    onPress: () {},
+                    text: 'Completed',
+                    animationDuration: const Duration(milliseconds: 500),
+                    transitionType: TransitionType.CENTER_ROUNDER,
+                    backgroundColor: Colors.transparent,
+                    borderRadius: 10,
+                    selectedBackgroundColor: color,
+                    selectedTextColor: Colors.white,
+                  ),
+                ),
               buildBottomSheetButton(
-                label: 'Completed',
-                color: task.color == 0
-                    ? Theme.of(context).colorScheme.primary
-                    : task.color == 1
-                        ? Theme.of(context).colorScheme.secondary
-                        : Colors.teal,
+                label: 'Delete',
+                color: color,
                 onTap: () {
                   Get.back();
                 },
               ),
-            buildBottomSheetButton(
-              label: 'Delete',
-              color: task.color == 0
-                  ? Theme.of(context).colorScheme.primary
-                  : task.color == 1
-                      ? Theme.of(context).colorScheme.secondary
-                      : Colors.teal,
-              onTap: () {
-                Get.back();
-              },
-            ),
-            Divider(color: Theme.of(context).primaryColor, height: 3),
-            buildBottomSheetButton(
-              label: 'Cancel',
-              color: task.color == 0
-                  ? Theme.of(context).colorScheme.primary
-                  : task.color == 1
-                      ? Theme.of(context).colorScheme.secondary
-                      : Colors.teal,
-              onTap: () {
-                Get.back();
-              },
-            ),
-          ],
+              Divider(color: color, height: 3),
+              buildBottomSheetButton(
+                label: 'Cancel',
+                color: color,
+                onTap: () {
+                  Get.back();
+                },
+              ),
+            ],
+          ),
         ),
       ),
-    ));
+      elevation: 10,
+      barrierColor: Get.isDarkMode ? Colors.white12 : Colors.black26,
+    );
   }
 
   buildBottomSheetButton({
@@ -158,46 +147,59 @@ class _HomePageState extends State<HomePage> {
   }
 
   showTasks(BuildContext context) {
-    return Stack(
-      children: [
-        AnimatedPositioned(
-          duration: const Duration(milliseconds: 1500),
-          child: SingleChildScrollView(
-            child: Wrap(
-              direction: SizeConfig.orientation == Orientation.landscape
-                  ? Axis.horizontal
-                  : Axis.vertical,
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                SizeConfig.orientation == Orientation.landscape
-                    ? const SizedBox(height: 0)
-                    : const SizedBox(height: 140),
-                SvgPicture.asset(
-                  'assets/images/task.svg',
-                  height: 90,
-                  color: context.theme.primaryColor.withOpacity(0.7),
-                  semanticsLabel: 'Task',
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: Text(
-                    'You do not have any tasks yet! \n Add new tasks to make your days productive.',
-                    textAlign: TextAlign.center,
-                    style: context.textTheme.bodyText1!.copyWith(fontSize: 16),
+    return Wrap(
+      direction: SizeConfig.orientation == Orientation.landscape
+          ? Axis.horizontal
+          : Axis.vertical,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: _taskController.tasksList.isEmpty
+          ? buildSVG(context)
+          : _taskController.tasksList
+              .map(
+                (task) => AnimationConfiguration.staggeredList(
+                  position:
+                      _taskController.tasksList.indexWhere((e) => e == task),
+                  duration: const Duration(milliseconds: 1000),
+                  child: SlideAnimation(
+                    horizontalOffset: 300,
+                    child: FadeInAnimation(
+                      child: GestureDetector(
+                        onTap: () => showBottomSheet(context, task),
+                        child: TaskTile(task),
+                      ),
+                    ),
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
-      ],
+              )
+              .toList(),
     );
+  }
+
+  List<Widget> buildSVG(BuildContext context) {
+    return [
+      SizeConfig.orientation == Orientation.landscape
+          ? const SizedBox(height: 0)
+          : const SizedBox(height: 140),
+      SvgPicture.asset(
+        'assets/images/task.svg',
+        height: 90,
+        color: context.theme.primaryColor.withOpacity(0.7),
+        semanticsLabel: 'Task',
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Text(
+          'You do not have any tasks yet! \n Add new tasks to make your days productive.',
+          textAlign: TextAlign.center,
+          style: context.textTheme.bodyText1!.copyWith(fontSize: 16),
+        ),
+      ),
+    ];
   }
 
   Container buildTaskBar(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(top: 10, left: 20),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -218,17 +220,43 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          CustomButton('Add Task  +', () async {
-            await Get.to(() => const AddTask());
-            _taskController.getTasks();
-          })
+          OpenContainer(
+            closedBuilder: (ctx, act) => Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              decoration: BoxDecoration(
+                color: context.theme.primaryColor,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Text(
+                'Add Task +',
+                style: Theme.of(context)
+                    .textTheme
+                    .headline5!
+                    .copyWith(fontSize: 18, color: Colors.white),
+              ),
+            ),
+            openBuilder: (ctx, act) => const AddTask(),
+            closedElevation: 0,
+            openElevation: 0,
+            closedColor: Colors.transparent,
+            onClosed: (_) => _taskController.getTasks(),
+          ),
         ],
       ),
     );
   }
 
-  AppBar customAppBar({required String title, required bool centerTitle}) {
+  AppBar customAppBar({required String title}) {
     return AppBar(
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 10),
+        child: GestureDetector(
+          onTap: () {},
+          child: const CircleAvatar(
+            backgroundImage: AssetImage('assets/images/person.jpeg'),
+          ),
+        ),
+      ),
       actions: [
         IconButton(
           onPressed: () {
@@ -241,21 +269,11 @@ class _HomePageState extends State<HomePage> {
             color: context.theme.iconTheme.color,
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(right: 10),
-          child: GestureDetector(
-            onTap: () {},
-            child: const CircleAvatar(
-              backgroundImage: AssetImage('assets/images/person.jpeg'),
-            ),
-          ),
-        ),
       ],
       title: Text(
         title,
         style: TextStyle(color: context.theme.textTheme.headline6!.color),
       ),
-      centerTitle: centerTitle,
     );
   }
 
