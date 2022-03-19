@@ -4,7 +4,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../logic/models/task.dart';
 import '../widgets/button.dart';
+import '../widgets/task_tile.dart';
 import '/constants/size_config.dart';
 import '/logic/controllers/task_controller.dart';
 import '/logic/services/notification_services.dart';
@@ -37,24 +39,121 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: customAppBar(title: 'ToDo App', centerTitle: false),
       body: SafeArea(
-          child: Column(
-        children: [
-          buildTaskBar(context),
-          buildDateTimeLine(context),
-          showTasks(context),
-          // TaskTile(
-          //   Task(
-          //     title: 'Title',
-          //     note:
-          //         'note note note note note note note note note note note note note note note note note note note note note note note note note',
-          //     isCompleted: 0,
-          //     startTime: '10:30',
-          //     endTime: '11:00',
-          //     color: 1
-          //   ),
-          // ),
-        ],
+          child: SingleChildScrollView(
+        child: Column(
+          children: [
+            buildTaskBar(context),
+            buildDateTimeLine(context),
+            // showTasks(context),
+            GestureDetector(
+              onTap: () {
+                showBottomSheet(
+                  context,
+                  Task(
+                      title: 'Title',
+                      note:
+                          'note note note note note note note note note note note note note note note note note note note note note note note note note',
+                      isCompleted: 0,
+                      startTime: '10:30',
+                      endTime: '11:00',
+                      color: 2),
+                );
+              },
+              child: TaskTile(
+                Task(
+                    title: 'Title',
+                    note:
+                        'note note note note note note note note note note note note note note note note note note note note note note note note note',
+                    isCompleted: 0,
+                    startTime: '10:30',
+                    endTime: '11:00',
+                    color: 2),
+              ),
+            ),
+          ],
+        ),
       )),
+    );
+  }
+
+  showBottomSheet(context, Task task) {
+    Get.bottomSheet(SingleChildScrollView(
+      child: Container(
+        width: SizeConfig.screenWidth * 0.9,
+        height: task.isCompleted == 0
+            ? SizeConfig.screenHeight * 0.35
+            : SizeConfig.screenHeight * 0.25,
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.only(
+            topRight: Radius.circular(30),
+            topLeft: Radius.circular(30),
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            if (task.isCompleted == 0)
+              buildBottomSheetButton(
+                label: 'Completed',
+                color: task.color == 0
+                    ? Theme.of(context).colorScheme.primary
+                    : task.color == 1
+                        ? Theme.of(context).colorScheme.secondary
+                        : Colors.teal,
+                onTap: () {
+                  Get.back();
+                },
+              ),
+            buildBottomSheetButton(
+              label: 'Delete',
+              color: task.color == 0
+                  ? Theme.of(context).colorScheme.primary
+                  : task.color == 1
+                      ? Theme.of(context).colorScheme.secondary
+                      : Colors.teal,
+              onTap: () {
+                Get.back();
+              },
+            ),
+            Divider(color: Theme.of(context).primaryColor, height: 3),
+            buildBottomSheetButton(
+              label: 'Cancel',
+              color: task.color == 0
+                  ? Theme.of(context).colorScheme.primary
+                  : task.color == 1
+                      ? Theme.of(context).colorScheme.secondary
+                      : Colors.teal,
+              onTap: () {
+                Get.back();
+              },
+            ),
+          ],
+        ),
+      ),
+    ));
+  }
+
+  buildBottomSheetButton({
+    required String label,
+    required Function() onTap,
+    required Color color,
+    bool isCompleted = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: SizeConfig.screenWidth * 0.7,
+        height: SizeConfig.screenHeight * 0.065,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15), color: color),
+        child: Text(label,
+            style: Theme.of(context)
+                .textTheme
+                .headline5!
+                .copyWith(color: Colors.white)),
+      ),
     );
   }
 

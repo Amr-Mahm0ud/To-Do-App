@@ -10,6 +10,7 @@ class TaskTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 5),
       padding: EdgeInsets.all(getProportionateScreenWidth(
           SizeConfig.orientation == Orientation.landscape ? 25 : 15)),
       width: SizeConfig.screenWidth * 0.9,
