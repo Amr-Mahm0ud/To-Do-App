@@ -25,13 +25,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   DateTime selectedDate = DateTime.now();
   final TaskController _taskController = Get.put(TaskController());
-  late NotifyHelper notifyHelper;
 
   @override
   void initState() {
     super.initState();
-    notifyHelper = NotifyHelper();
-    notifyHelper.requestIOSPermissions();
+    NotifyHelper().requestIOSPermissions();
     _taskController.getTasks();
   }
 
@@ -50,6 +48,16 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
+          IconButton(
+            onPressed: () {
+              _taskController.deleteAllTasks();
+              NotifyHelper().cancelAllNotification();
+            },
+            icon: Icon(
+              Icons.cleaning_services_rounded,
+              color: context.theme.iconTheme.color,
+            ),
+          ),
           IconButton(
             onPressed: () {
               ThemeServices().switchTheme();
@@ -114,13 +122,17 @@ class _HomePageState extends State<HomePage> {
                   child: AnimatedButton(
                     onPress: () {
                       _taskController.completeTask(task.id!);
+                      NotifyHelper().cancelNotification(task);
+                      Future.delayed(const Duration(milliseconds: 300)).then(
+                        (_) => Get.back(),
+                      );
                     },
                     text: 'Completed',
                     textStyle: Theme.of(context)
                         .textTheme
                         .headline5!
                         .copyWith(color: color),
-                    animationDuration: const Duration(milliseconds: 500),
+                    animationDuration: const Duration(milliseconds: 300),
                     transitionType: TransitionType.CENTER_ROUNDER,
                     backgroundColor: Colors.transparent,
                     borderRadius: 10,
@@ -130,9 +142,10 @@ class _HomePageState extends State<HomePage> {
                 ),
               buildBottomSheetButton(
                 label: 'Delete',
-                color: color,
+                color: Theme.of(context).colorScheme.error,
                 onTap: () async {
                   _taskController.deleteTask(task);
+                  NotifyHelper().cancelNotification(task);
                   Get.back();
                 },
               ),
@@ -179,40 +192,59 @@ class _HomePageState extends State<HomePage> {
   showTasks(BuildContext context) {
     return Expanded(
       child: Obx(
-        () => RefreshIndicator(
-          onRefresh: () => _taskController.getTasks(),
-          child: ListView(
-            scrollDirection: SizeConfig.orientation == Orientation.landscape
-                ? Axis.horizontal
-                : Axis.vertical,
-            children: _taskController.tasksList.isEmpty
-                ? buildSVG(context)
-                : _taskController.tasksList.map(
-                    (task) {
-                      var date = DateFormat.jm().parse(task.startTime!);
-                      var time = DateFormat('HH:mm').format(date);
-                      notifyHelper.scheduledNotification(
-                          int.parse(time.toString().split(':')[0]),
-                          int.parse(time.toString().split(':')[1]),
-                          task);
-                      return AnimationConfiguration.staggeredList(
-                        position: _taskController.tasksList
-                            .indexWhere((e) => e == task),
-                        duration: const Duration(milliseconds: 1000),
-                        child: SlideAnimation(
-                          horizontalOffset: 300,
-                          child: FadeInAnimation(
-                            child: GestureDetector(
-                              onTap: () => showBottomSheet(context, task),
-                              child: TaskTile(task),
+        () {
+          Iterable<Task> tasks = _taskController.tasksList.where((task) {
+            return (task.date == DateFormat.yMd().format(selectedDate) ||
+                    task.repeat == 'Daily') ||
+                (task.repeat == 'Weekly' &&
+                    selectedDate
+                                .difference(DateFormat.yMd().parse(task.date!))
+                                .inDays %
+                            7 ==
+                        0) ||
+                (task.repeat == 'Monthly' &&
+                    DateFormat.yMd().parse(task.date!).day ==
+                        selectedDate.day) ||
+                (task.repeat == 'Yearly' &&
+                    DateFormat.yMd().parse(task.date!).month ==
+                        selectedDate.month &&
+                    DateFormat.yMd().parse(task.date!).day == selectedDate.day);
+          });
+          return RefreshIndicator(
+            onRefresh: () => _taskController.getTasks(),
+            child: ListView(
+              scrollDirection: SizeConfig.orientation == Orientation.landscape
+                  ? Axis.horizontal
+                  : Axis.vertical,
+              children: tasks.isEmpty
+                  ? buildSVG(context)
+                  : tasks.map(
+                      (task) {
+                        var date = DateFormat.jm().parse(task.startTime!);
+                        var time = DateFormat('HH:mm').format(date);
+                        NotifyHelper().scheduledNotification(
+                            int.parse(time.toString().split(':')[0]),
+                            int.parse(time.toString().split(':')[1]),
+                            task);
+                        return AnimationConfiguration.staggeredList(
+                          position: _taskController.tasksList
+                              .indexWhere((e) => e == task),
+                          duration: const Duration(milliseconds: 800),
+                          child: SlideAnimation(
+                            horizontalOffset: 300,
+                            child: FadeInAnimation(
+                              child: GestureDetector(
+                                onTap: () => showBottomSheet(context, task),
+                                child: TaskTile(task),
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ).toList(),
-          ),
-        ),
+                        );
+                      },
+                    ).toList(),
+            ),
+          );
+        },
       ),
     );
   }
@@ -231,7 +263,7 @@ class _HomePageState extends State<HomePage> {
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Text(
-          'You do not have any tasks yet! \n Add new tasks to make your days productive.',
+          'You do not have any tasks for ${DateFormat.yMMMMd().format(selectedDate) == DateFormat.yMMMMd().format(DateTime.now()) ? 'Today' : DateFormat.EEEE().format(selectedDate)}! \n Add new tasks to make your days productive.',
           textAlign: TextAlign.center,
           style: context.textTheme.bodyText1!.copyWith(fontSize: 16),
         ),
