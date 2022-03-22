@@ -1,45 +1,32 @@
 import 'package:get/state_manager.dart';
-import 'package:intl/intl.dart';
+import '../db/db_helper.dart';
 import '../models/task.dart';
 
 class TaskController extends GetxController {
-  List<Task> tasksList = [
-    Task(
-        title: 'Title',
-        note:
-            'note note note note note note note note note note note note note note note note note note note note note note note note note',
-        isCompleted: 0,
-        startTime: DateFormat('hh:mm a')
-            .format(DateTime.now().add(const Duration(minutes: 5)))
-            .toString(),
-        endTime: DateFormat('hh:mm a')
-            .format(DateTime.now().add(const Duration(minutes: 30)))
-            .toString(),
-        color: 2),
-    Task(
-        title: 'Title',
-        note:
-            'note note note note note note note note note note note note note note note note note note note note note note note note note',
-        isCompleted: 1,
-        startTime: DateFormat('hh:mm a')
-            .format(DateTime.now().add(const Duration(minutes: 10)))
-            .toString(),
-        endTime: DateFormat('hh:mm a')
-            .format(DateTime.now().add(const Duration(minutes: 35)))
-            .toString(),
-        color: 0),
-    Task(
-        title: 'Title',
-        note:
-            'note note note note note note note note note note note note note note note note note note note note note note note note note',
-        isCompleted: 0,
-        startTime: DateFormat('hh:mm a')
-            .format(DateTime.now().add(const Duration(minutes: 15)))
-            .toString(),
-        endTime: DateFormat('hh:mm a')
-            .format(DateTime.now().add(const Duration(minutes: 40)))
-            .toString(),
-        color: 1),
-  ];
-  getTasks() {}
+  RxList<Task> tasksList = <Task>[].obs;
+
+  Future<int> addTask(Task task) {
+    return DBHelper.insert(task);
+  }
+
+  void deleteTask(Task task) async {
+    await DBHelper.delete(task);
+    getTasks();
+  }
+
+  void completeTask(int id) async {
+    await DBHelper.update(id);
+    getTasks();
+  }
+
+  Future<void> getTasks() async {
+    final List tasks = await DBHelper.query();
+    tasksList.assignAll(
+      tasks
+          .map(
+            (json) => Task.fromJson(json),
+          )
+          .toList(),
+    );
+  }
 }

@@ -24,6 +24,8 @@ dependencies:
   flutter_animated_button: ^2.0.0
   animations: ^2.0.2
   sqflite: ^2.0.2
+  rxdart: ^0.27.2
+  flutter_native_timezone: ^2.0.0
 
 dev_dependencies:
   flutter_test:

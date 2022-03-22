@@ -31,7 +31,8 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     notifyHelper = NotifyHelper();
-    notifyHelper.iosRequestPermission();
+    notifyHelper.requestIOSPermissions();
+    _taskController.getTasks();
   }
 
   @override
@@ -65,14 +66,12 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: SafeArea(
-          child: SingleChildScrollView(
-        child: Column(
-          children: [
-            buildTaskBar(context),
-            buildDateTimeLine(context),
-            showTasks(context),
-          ],
-        ),
+          child: Column(
+        children: [
+          buildTaskBar(context),
+          buildDateTimeLine(context),
+          showTasks(context),
+        ],
       )),
     );
   }
@@ -113,8 +112,14 @@ class _HomePageState extends State<HomePage> {
                       color:
                           task.isCompleted == 0 ? Colors.transparent : color),
                   child: AnimatedButton(
-                    onPress: () {},
+                    onPress: () {
+                      _taskController.completeTask(task.id!);
+                    },
                     text: 'Completed',
+                    textStyle: Theme.of(context)
+                        .textTheme
+                        .headline5!
+                        .copyWith(color: color),
                     animationDuration: const Duration(milliseconds: 500),
                     transitionType: TransitionType.CENTER_ROUNDER,
                     backgroundColor: Colors.transparent,
@@ -126,7 +131,8 @@ class _HomePageState extends State<HomePage> {
               buildBottomSheetButton(
                 label: 'Delete',
                 color: color,
-                onTap: () {
+                onTap: () async {
+                  _taskController.deleteTask(task);
                   Get.back();
                 },
               ),
@@ -171,37 +177,43 @@ class _HomePageState extends State<HomePage> {
   }
 
   showTasks(BuildContext context) {
-    return Wrap(
-      direction: SizeConfig.orientation == Orientation.landscape
-          ? Axis.horizontal
-          : Axis.vertical,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: _taskController.tasksList.isEmpty
-          ? buildSVG(context)
-          : _taskController.tasksList.map(
-              (task) {
-                var date = DateFormat.jm().parse(task.startTime!);
-                var time = DateFormat('HH:mm').format(date);
-                notifyHelper.scheduledNotification(
-                    int.parse(time.toString().split(':')[0]),
-                    int.parse(time.toString().split(':')[1]),
-                    task);
-                return AnimationConfiguration.staggeredList(
-                  position:
-                      _taskController.tasksList.indexWhere((e) => e == task),
-                  duration: const Duration(milliseconds: 1000),
-                  child: SlideAnimation(
-                    horizontalOffset: 300,
-                    child: FadeInAnimation(
-                      child: GestureDetector(
-                        onTap: () => showBottomSheet(context, task),
-                        child: TaskTile(task),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ).toList(),
+    return Expanded(
+      child: Obx(
+        () => RefreshIndicator(
+          onRefresh: () => _taskController.getTasks(),
+          child: ListView(
+            scrollDirection: SizeConfig.orientation == Orientation.landscape
+                ? Axis.horizontal
+                : Axis.vertical,
+            children: _taskController.tasksList.isEmpty
+                ? buildSVG(context)
+                : _taskController.tasksList.map(
+                    (task) {
+                      var date = DateFormat.jm().parse(task.startTime!);
+                      var time = DateFormat('HH:mm').format(date);
+                      notifyHelper.scheduledNotification(
+                          int.parse(time.toString().split(':')[0]),
+                          int.parse(time.toString().split(':')[1]),
+                          task);
+                      return AnimationConfiguration.staggeredList(
+                        position: _taskController.tasksList
+                            .indexWhere((e) => e == task),
+                        duration: const Duration(milliseconds: 1000),
+                        child: SlideAnimation(
+                          horizontalOffset: 300,
+                          child: FadeInAnimation(
+                            child: GestureDetector(
+                              onTap: () => showBottomSheet(context, task),
+                              child: TaskTile(task),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ).toList(),
+          ),
+        ),
+      ),
     );
   }
 

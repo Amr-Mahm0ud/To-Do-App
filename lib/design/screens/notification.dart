@@ -13,8 +13,8 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
-    final bodyTextStyle =
-        context.theme.textTheme.bodyText1!.copyWith(fontSize: 18);
+    final bodyTextStyle = context.theme.textTheme.bodyText1!
+        .copyWith(fontSize: 18, color: Colors.white);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -43,51 +43,69 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   color: context.theme.textTheme.subtitle1!.color!
                       .withOpacity(0.7)),
             ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                margin: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: context.theme.primaryColor,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: SingleChildScrollView(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.text_format_rounded),
-                        const SizedBox(width: 20),
-                        Text('Title', style: context.theme.textTheme.headline6)
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Text(widget.payLoad.split('|')[0], style: bodyTextStyle),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        const Icon(Icons.description),
-                        const SizedBox(width: 20),
-                        Text('Description',
-                            style: context.theme.textTheme.headline6)
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Text(widget.payLoad.split('|')[1], style: bodyTextStyle),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        const Icon(Icons.calendar_today_rounded),
-                        const SizedBox(width: 20),
-                        Text('Time', style: context.theme.textTheme.headline6)
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Text(widget.payLoad.split('|')[2], style: bodyTextStyle),
-                  ],
-                )),
+            Container(
+              padding: const EdgeInsets.all(25),
+              margin: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: context.theme.primaryColor,
+                borderRadius: BorderRadius.circular(30),
               ),
+              child: SingleChildScrollView(
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.text_format_rounded,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 20),
+                      Text(
+                        'Title',
+                        style: context.theme.textTheme.headline6!
+                            .copyWith(color: Colors.white),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Text(widget.payLoad.split('|')[0], style: bodyTextStyle),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.description,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 20),
+                      Text(
+                        'Description',
+                        style: context.theme.textTheme.headline6!
+                            .copyWith(color: Colors.white),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Text(widget.payLoad.split('|')[1], style: bodyTextStyle),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today_rounded,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 20),
+                      Text(
+                        'Time',
+                        style: context.theme.textTheme.headline6!
+                            .copyWith(color: Colors.white),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Text(widget.payLoad.split('|')[2], style: bodyTextStyle),
+                ],
+              )),
             )
           ],
         ),

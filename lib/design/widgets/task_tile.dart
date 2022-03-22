@@ -10,10 +10,12 @@ class TaskTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 5),
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
       padding: EdgeInsets.all(getProportionateScreenWidth(
-          SizeConfig.orientation == Orientation.landscape ? 25 : 15)),
-      width: SizeConfig.screenWidth * 0.9,
+          SizeConfig.orientation == Orientation.landscape ? 5 : 15)),
+      width: SizeConfig.orientation == Orientation.portrait
+          ? SizeConfig.screenWidth * 0.9
+          : SizeConfig.screenWidth * 0.4,
       decoration: BoxDecoration(
         color: task.color == 0
             ? Theme.of(context).colorScheme.primary

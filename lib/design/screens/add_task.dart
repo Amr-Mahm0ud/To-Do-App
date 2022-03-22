@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/design/widgets/button.dart';
 import 'package:todo_app/logic/controllers/task_controller.dart';
+import 'package:todo_app/logic/models/task.dart';
 import '../widgets/input_field.dart';
 
 class AddTask extends StatefulWidget {
@@ -15,8 +16,8 @@ class AddTask extends StatefulWidget {
 class _AddTaskState extends State<AddTask> {
   final TaskController taskController = Get.put(TaskController());
   TextEditingController titleController = TextEditingController();
-  TextEditingController hintController = TextEditingController();
-  DateTime currentDate = DateTime.now();
+  TextEditingController noteController = TextEditingController();
+  DateTime selectedDate = DateTime.now();
   String startTime = DateFormat('hh:mm a').format(DateTime.now()).toString();
   String endTime = DateFormat('hh:mm a')
       .format(DateTime.now().add(const Duration(minutes: 15)))
@@ -60,16 +61,16 @@ class _AddTaskState extends State<AddTask> {
               InputField(
                 title: 'Note',
                 hint: 'Enter note here',
-                controller: hintController,
+                controller: noteController,
               ),
               const SizedBox(height: 10),
               // date
               InputField(
                 title: 'Date',
-                hint: DateFormat.yMd().format(currentDate),
+                hint: DateFormat.yMd().format(selectedDate),
                 widget: IconButton(
                   icon: const Icon(Icons.calendar_today_rounded),
-                  onPressed: () {},
+                  onPressed: () => getDateFormUser(),
                 ),
               ),
               const SizedBox(height: 10),
@@ -81,8 +82,9 @@ class _AddTaskState extends State<AddTask> {
                       title: 'Start Time',
                       hint: startTime,
                       widget: IconButton(
-                          icon: const Icon(Icons.access_alarm),
-                          onPressed: () {}),
+                        icon: const Icon(Icons.access_alarm),
+                        onPressed: () => getTimeFromUser(isStart: true),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -91,8 +93,9 @@ class _AddTaskState extends State<AddTask> {
                       title: 'End Time',
                       hint: endTime,
                       widget: IconButton(
-                          icon: const Icon(Icons.access_alarm),
-                          onPressed: () {}),
+                        icon: const Icon(Icons.access_alarm),
+                        onPressed: () => getTimeFromUser(isStart: false),
+                      ),
                     ),
                   ),
                 ],
@@ -192,7 +195,7 @@ class _AddTaskState extends State<AddTask> {
                 ],
               ),
               CustomButton('Create Task', () {
-                Get.back();
+                validation();
               })
             ],
           ),
@@ -214,5 +217,89 @@ class _AddTaskState extends State<AddTask> {
         child: isSelected ? const Icon(Icons.done, color: Colors.white) : null,
       ),
     );
+  }
+
+  validation() {
+    if (titleController.text.trim().isNotEmpty &&
+        noteController.text.trim().isNotEmpty) {
+      addTasksToDB();
+      Get.back();
+    } else if (titleController.text.trim().isEmpty ||
+        noteController.text.trim().isEmpty) {
+      Get.snackbar(
+        'Required',
+        'please fill the empty fields',
+        icon: const Icon(Icons.error_outline_rounded),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Theme.of(context).errorColor,
+        animationDuration: const Duration(milliseconds: 300),
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Error',
+        'an error ocurred',
+        icon: const Icon(Icons.error_rounded),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Theme.of(context).errorColor,
+        animationDuration: const Duration(milliseconds: 300),
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  addTasksToDB() async {
+    int taskId = await taskController.addTask(Task(
+      title: titleController.text.trim(),
+      note: noteController.text.trim(),
+      isCompleted: 0,
+      color: selectedColor,
+      date: DateFormat.yMd().format(selectedDate),
+      startTime: startTime,
+      endTime: endTime,
+      repeat: selectedRepeat,
+      remind: selectedRemind,
+    ));
+    print(taskId);
+  }
+
+  getDateFormUser() async {
+    DateTime? newDate = await showDatePicker(
+      context: context,
+      firstDate: DateTime.now(),
+      initialDate: selectedDate,
+      lastDate: DateTime(selectedDate.year + 5),
+      currentDate: selectedDate,
+    );
+    if (newDate != null) {
+      setState(() {
+        selectedDate = newDate;
+      });
+    }
+  }
+
+  getTimeFromUser({required bool isStart}) async {
+    TimeOfDay? newTime = await showTimePicker(
+      context: context,
+      initialEntryMode: TimePickerEntryMode.input,
+      initialTime: isStart
+          ? TimeOfDay.fromDateTime(DateTime.now())
+          : TimeOfDay.fromDateTime(
+              DateTime.now().add(const Duration(minutes: 15)),
+            ),
+    );
+    if (newTime != null) {
+      if (isStart) {
+        setState(() {
+          startTime = newTime.format(context);
+          endTime =
+              newTime.replacing(minute: newTime.minute + 15).format(context);
+        });
+      } else {
+        setState(() {
+          endTime = newTime.format(context);
+        });
+      }
+    }
   }
 }
