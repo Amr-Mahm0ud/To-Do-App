@@ -31,7 +31,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     notifyHelper = NotifyHelper();
-    // notifyHelper.scheduleNotification(hours: 0, minutes: 0, seconds: 3);
     notifyHelper.iosRequestPermission();
   }
 
@@ -39,7 +38,32 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Scaffold(
-      appBar: customAppBar(title: 'Hey, Amr Mahmoud'),
+      appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 10),
+          child: GestureDetector(
+            onTap: () {},
+            child: const CircleAvatar(
+              backgroundImage: AssetImage('assets/images/person.jpeg'),
+            ),
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              ThemeServices().switchTheme();
+            },
+            icon: Icon(
+              Get.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round,
+              color: context.theme.iconTheme.color,
+            ),
+          ),
+        ],
+        title: Text(
+          'Hello, Amr Mahmoud',
+          style: TextStyle(color: context.theme.textTheme.headline6!.color),
+        ),
+      ),
       body: SafeArea(
           child: SingleChildScrollView(
         child: Column(
@@ -154,9 +178,15 @@ class _HomePageState extends State<HomePage> {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: _taskController.tasksList.isEmpty
           ? buildSVG(context)
-          : _taskController.tasksList
-              .map(
-                (task) => AnimationConfiguration.staggeredList(
+          : _taskController.tasksList.map(
+              (task) {
+                var date = DateFormat.jm().parse(task.startTime!);
+                var time = DateFormat('HH:mm').format(date);
+                notifyHelper.scheduledNotification(
+                    int.parse(time.toString().split(':')[0]),
+                    int.parse(time.toString().split(':')[1]),
+                    task);
+                return AnimationConfiguration.staggeredList(
                   position:
                       _taskController.tasksList.indexWhere((e) => e == task),
                   duration: const Duration(milliseconds: 1000),
@@ -169,9 +199,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                ),
-              )
-              .toList(),
+                );
+              },
+            ).toList(),
     );
   }
 
@@ -242,37 +272,6 @@ class _HomePageState extends State<HomePage> {
             onClosed: (_) => _taskController.getTasks(),
           ),
         ],
-      ),
-    );
-  }
-
-  AppBar customAppBar({required String title}) {
-    return AppBar(
-      leading: Padding(
-        padding: const EdgeInsets.only(left: 10),
-        child: GestureDetector(
-          onTap: () {},
-          child: const CircleAvatar(
-            backgroundImage: AssetImage('assets/images/person.jpeg'),
-          ),
-        ),
-      ),
-      actions: [
-        IconButton(
-          onPressed: () {
-            ThemeServices().switchTheme();
-            NotifyHelper()
-                .displayNotification(title: 'ToDo App', body: 'theme switched');
-          },
-          icon: Icon(
-            Get.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round,
-            color: context.theme.iconTheme.color,
-          ),
-        ),
-      ],
-      title: Text(
-        title,
-        style: TextStyle(color: context.theme.textTheme.headline6!.color),
       ),
     );
   }

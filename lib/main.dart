@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import '/logic/db/db_helper.dart';
 import 'constants/theme.dart';
 import 'design/screens/home.dart';
 import 'logic/services/notification_services.dart';
@@ -9,6 +10,7 @@ import 'logic/services/theme_services.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
+  await DBHelper.initDB();
   await NotifyHelper().initializeNotification();
   runApp(const ToDoApp());
 }

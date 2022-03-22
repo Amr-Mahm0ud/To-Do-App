@@ -30,8 +30,18 @@ class _AddTaskState extends State<AddTask> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar(
-        title: 'Add Task',
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_rounded,
+              color: context.theme.iconTheme.color),
+          onPressed: () {
+            Get.back();
+          },
+        ),
+        title: Text(
+          'Add Task',
+          style: TextStyle(color: context.theme.textTheme.headline6!.color),
+        ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -203,34 +213,6 @@ class _AddTaskState extends State<AddTask> {
         backgroundColor: color,
         child: isSelected ? const Icon(Icons.done, color: Colors.white) : null,
       ),
-    );
-  }
-
-  AppBar customAppBar({required String title, required bool centerTitle}) {
-    return AppBar(
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back_rounded,
-            color: context.theme.iconTheme.color),
-        onPressed: () {
-          Get.back();
-        },
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 10),
-          child: GestureDetector(
-            onTap: () {},
-            child: const CircleAvatar(
-              backgroundImage: AssetImage('assets/images/person.jpeg'),
-            ),
-          ),
-        ),
-      ],
-      title: Text(
-        title,
-        style: TextStyle(color: context.theme.textTheme.headline6!.color),
-      ),
-      centerTitle: centerTitle,
     );
   }
 }
