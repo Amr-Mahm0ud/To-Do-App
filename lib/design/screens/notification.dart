@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:todo_app/logic/services/user_data.dart';
+
+import '../../logic/models/user.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key, required this.payLoad}) : super(key: key);
@@ -13,6 +16,7 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
+    User currentUser = UserData().loadUser();
     final bodyTextStyle = context.theme.textTheme.bodyText1!
         .copyWith(fontSize: 18, color: Colors.white);
     return Scaffold(
@@ -32,7 +36,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'Hello, Amr Mahmoud',
+              'Hello, ${currentUser.userName}',
               style: context.theme.textTheme.headline5!
                   .copyWith(fontSize: 30, fontWeight: FontWeight.bold),
             ),

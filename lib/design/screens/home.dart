@@ -6,13 +6,15 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_app/design/screens/profile.dart';
 import 'package:todo_app/design/widgets/task_tile.dart';
+import 'package:todo_app/logic/models/user.dart';
+import 'package:todo_app/logic/services/user_data.dart';
 
 import '../../logic/models/task.dart';
 import '/constants/size_config.dart';
 import '/logic/controllers/task_controller.dart';
 import '/logic/services/notification_services.dart';
-import '/logic/services/theme_services.dart';
 import 'add_task.dart';
 
 class HomePage extends StatefulWidget {
@@ -35,41 +37,32 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    User currentUser = UserData().loadUser();
     SizeConfig().init(context);
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.only(left: 10),
-          child: GestureDetector(
-            onTap: () {},
-            child: const CircleAvatar(
-              backgroundImage: AssetImage('assets/images/person.jpeg'),
+          child: OpenContainer(
+            closedBuilder: (context, action) => CircleAvatar(
+              backgroundColor: context.theme.primaryColor,
+              backgroundImage:
+                  AssetImage(User.profilePictures[currentUser.profilePic]),
             ),
+            openBuilder: (context, action) => const ProfileScreen(),
+            closedElevation: 0,
+            openElevation: 0,
+            closedColor: Colors.transparent,
+            onClosed: (_) {
+              _taskController.getTasks();
+              setState(() {
+                currentUser = UserData().loadUser();
+              });
+            },
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              _taskController.deleteAllTasks();
-              NotifyHelper().cancelAllNotification();
-            },
-            icon: Icon(
-              Icons.cleaning_services_rounded,
-              color: context.theme.iconTheme.color,
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              ThemeServices().switchTheme();
-            },
-            icon: Icon(
-              Get.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round,
-              color: context.theme.iconTheme.color,
-            ),
-          ),
-        ],
         title: Text(
-          'Hello, Amr Mahmoud',
+          'Hello, ${currentUser.userName}',
           style: TextStyle(color: context.theme.textTheme.headline6!.color),
         ),
       ),
